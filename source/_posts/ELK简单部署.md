@@ -3,7 +3,6 @@ title: ELK简单部署
 date: 2020-12-30 20:08:18
 tags:
   - Elasticsearch
-  - 新的开始
 ---
 
 # ELK 简单部署
