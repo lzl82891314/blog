@@ -1,15 +1,18 @@
 ---
 title: .Net Core 入门（二）
+subtitle: 对 ORM 框架 Dapper 的封装
 date: 2018-05-29 19:52:51
-tags:
+categories:
   - .Net Core
   - C#
   - 很久以前
 ---
 
-# 对 ORM 框架 Dapper 的封装
+在新的.Net Core 站点搭建时，肯定是需要一个 ORM 框架来操作数据库的。由于需要旧项目的直接迁移，因此新的.Net Core 站点依旧选择了 StackExchange.Dapper 作为轻量级的 ORM 框架。
 
-在新的.Net Core 站点搭建时，肯定是需要一个 ORM 框架来操作数据库的。由于需要旧项目的直接迁移，因此新的.Net Core 站点依旧选择了 StackExchange.Dapper 作为轻量级的 ORM 框架。然而旧项目中，对 Dapper 的操作都是直接使用的，无论增删改查都需要自行写 Sql 自行创建 Dto，而且最主要的，并没有统一管理数据库连接，每次使用都是需要在 `using` 语句下 new 一个新的 `IDbConnection` 来操作数据库。这种写法很不优雅，并且没有可控性，由于.Net Core 项目内置了 DI 容器，加入了 `Service` 的概念，因此自然而然我就想自己封装一遍 Dapper 使其服务化提供项目使用。
+<!-- more -->
+
+然而旧项目中，对 Dapper 的操作都是直接使用的，无论增删改查都需要自行写 Sql 自行创建 Dto，而且最主要的，并没有统一管理数据库连接，每次使用都是需要在 `using` 语句下 new 一个新的 `IDbConnection` 来操作数据库。这种写法很不优雅，并且没有可控性，由于.Net Core 项目内置了 DI 容器，加入了 `Service` 的概念，因此自然而然我就想自己封装一遍 Dapper 使其服务化提供项目使用。
 
 ## 第一版——直接封装为 IQueryService
 

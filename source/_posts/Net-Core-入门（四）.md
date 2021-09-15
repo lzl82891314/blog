@@ -1,15 +1,16 @@
 ---
 title: .Net Core 入门（四）
+subtitle: 总结.Net Core 碰到的零碎问题
 date: 2018-05-31 19:55:02
-tags:
+categories:
   - .Net Core
   - C#
   - 很久以前
 ---
 
-# 总结.Net Core 碰到的零碎问题
-
 .Net Core 的新项目已经在正式运行了，但是开发期间还是遇到了很多小问题，这些问题不会影响整个开发的流程和使用，但是会影响开发效率和使用体验。
+
+<!-- more -->
 
 ## 问题一：Unicode 编码
 

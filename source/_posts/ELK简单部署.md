@@ -1,21 +1,21 @@
 ---
 title: ELK简单部署
 date: 2020-12-30 20:08:18
-tags:
+categories:
   - Elasticsearch
 ---
-
-# ELK 简单部署
-
-**说明：由于公司对此设施的需求度不是很高，因此项目中没有涉及 Logstash 对日志信息的管道通信处理，因此此文档仅介绍 E 和 K 即 Elasticsearch 和 Kibana**
 
 ## 简单介绍
 
 ELK 是 elastic 公司推出的一套分布式的日志分析系统，是 elastic stack 的核心组件，由三个子系统组成，即：elasticsearch（E）、logstash（L）以及 kibana（K）。在此分别简单介绍一下它们的功能点：
 
+<!-- more -->
+
 - **elasticsearch**是一款分布式的搜索引擎，是 elastic 公司的核心组件，在 elk 系统中它仅仅是做日志处理和搜索的简单逻辑，其实 elasticsearch 功能强大，常常作为应用的搜索引擎，比如 github 的高亮代码检索以及购物网站的商品搜索等都离不开 elasticsearch 的强大集群支持。其特点就是可以给用户带来几乎实时的大数据搜索展示。
 - **logstash**是依托于 elasticsearch 开发出的分布式日志分析系统，它的前身其实是 elasticsearch 的一个社区发起的第三方插件，之后被 elastic 公司收购，成为 elastic stack 中的一员，其主要功能是对收集到的日志进行管道处理，即：减缓大规模数据下 elasticsearch 的压力以及对日志的格式等做进一步的处理
 - **kibana**是一个数据可视化分析平台，主要是对收集起来的数据比如日志信息进行可视化展示以及图形化构建，其本身是 logstash 的一个插件工具，之后同样被 elastic 公司收购，成为 elastic stack 成员
+
+> **说明：由于公司对此设施的需求度不是很高，因此项目中没有涉及 Logstash 对日志信息的管道通信处理，因此此文档仅介绍 E 和 K 即 Elasticsearch 和 Kibana**
 
 因此，从上述的介绍可以知道，ELK 的主要功能都被 elasticsearch 占据，其余两个组件是依托于 elasticsearch 而存活的，我们可以通过下图来看一下 elastic stack 的相关内容：
 

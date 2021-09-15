@@ -1,17 +1,19 @@
 ---
 title: .Net Core 入门（一）
 date: 2018-05-28 19:50:55
-tags:
+categories:
   - .Net Core
   - C#
   - 很久以前
 ---
 
-# 前言
-
 公司新的.Net Core 项目需要修改站点的认证授权方式，以实现集团的 SSO 登录。
 
-通过对.Net Core 认证授权机制的学习，我目前知道了可以使用的两种认证方式： `CookieAuthentication` 和 `JwtTokenAuthentication` 。其中 Cookie 的方式是为 MVC 站点提供的，当站点登录之后站点请求登录的服务获取用户的登录信息，存在 Cookie 中作为每次站点请求的登录依据；JwtToken 的方式适用于 Web Api 项目，请求的移动端设备，通过请求站点获取授权的 Token 来调用站点服务。并且由于目标是为了实现公司内部的 SSO，所以并没有遵循 OAuth2 的协议，就是完全通过请求登录 API 种下 Cookie 来实现单点登录。因此，授权的方式就使用了 `CookieAuthentication`。
+通过对.Net Core 认证授权机制的学习，我目前知道了可以使用的两种认证方式： `CookieAuthentication` 和 `JwtTokenAuthentication` 。
+
+<!-- more -->
+
+其中 Cookie 的方式是为 MVC 站点提供的，当站点登录之后站点请求登录的服务获取用户的登录信息，存在 Cookie 中作为每次站点请求的登录依据；JwtToken 的方式适用于 Web Api 项目，请求的移动端设备，通过请求站点获取授权的 Token 来调用站点服务。并且由于目标是为了实现公司内部的 SSO，所以并没有遵循 OAuth2 的协议，就是完全通过请求登录 API 种下 Cookie 来实现单点登录。因此，授权的方式就使用了 `CookieAuthentication`。
 
 ## 项目实现
 
