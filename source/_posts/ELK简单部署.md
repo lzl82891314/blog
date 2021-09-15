@@ -5,8 +5,6 @@ categories:
   - Elasticsearch
 ---
 
-## 简单介绍
-
 ELK 是 elastic 公司推出的一套分布式的日志分析系统，是 elastic stack 的核心组件，由三个子系统组成，即：elasticsearch（E）、logstash（L）以及 kibana（K）。在此分别简单介绍一下它们的功能点：
 
 <!-- more -->
