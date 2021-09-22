@@ -39,7 +39,7 @@ categories:
 
 机缘巧合，在某个.Net Core 的学习群里问了一下这个问题，有位大哥说可以自定义 Cookie 的生成规则来解决这个问题，因为微软默认的生成规则是根据机器码加密的，可以改这个生成规则为自定义的，这样多台服务器的 Cookie 就会生成一致了。 并且自定义方法也很简单，只要在 `CookieAuthentication` 初始化的时候重新赋值 `TicketDataFormat` 属性就可以了：
 
-```C#
+```csharp
 services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
         .AddCookie(options =>
         {
@@ -55,7 +55,7 @@ services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
 
 `TicketDataFormat` 是一个 `ISecureDataFormat<TData>` 属性，其中有四个方法：
 
-```C#
+```csharp
 namespace Microsoft.AspNetCore.Authentication
 {
     public interface ISecureDataFormat<TData>

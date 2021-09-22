@@ -219,7 +219,7 @@ networks:
 
 通过上述的 docker-compose 文件，我们就可以通过`docker-compose up`直接启动我们的站点了，但是如上述配置节点所示，我们需要对一些配置信息做处理，因此我们需要以下 4 个不同的配置文件：
 
-```shell
+```yaml
 # 1. elasticsearch.yml
 cluster.name: forguncy-cloud # 集群的名称，如果需要扩展集群，则需要通过这个名称加入
 node.name: master # 节点名称，因为我们的系统是单节点的，因此就承担master的职责

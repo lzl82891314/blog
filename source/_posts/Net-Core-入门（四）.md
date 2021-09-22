@@ -19,7 +19,7 @@ categories:
 
 很显然这是一个配置项的问题，查询找到解决方案，在 `Startup` 配置的 `ConfigureServices` 服务配置方法中，注入一个编码服务即可：
 
-```C#
+```csharp
 //解决Unicode编码问题服务
 services.AddSingleton(HtmlEncoder.Create(UnicodeRanges.All));
 ```
@@ -28,7 +28,7 @@ services.AddSingleton(HtmlEncoder.Create(UnicodeRanges.All));
 
 在 Asp.Net MVC 框架中，UI 端的请求参数可以通过 Action 的形参接收：
 
-```C#
+```csharp
 public IActionResult Demo(string userName = "")
 {
     return View();
@@ -39,7 +39,7 @@ public IActionResult Demo(string userName = "")
 
 这很显然也是一个配置问题，查到的解决方案是：注入 `MVC service` 的时候，需要在 MVC 的 `ModelMetadataDetailsProviders` 配置项集合中加入对 `IDisplayMetadataProvider` 的自定义支持，将默认的 `ConvertEmptyStringToNull` 属性赋值为 `false` 。即需要加入如下自定义配置：
 
-```C#
+```csharp
 /// <summary>
 /// 自定义MetadataProvider
 /// 专门解决Action字符串类型返回值默认为Null为不是String.Empty的难问题
@@ -59,7 +59,7 @@ public class CustomMetadataProvider : IMetadataDetailsProvider, IDisplayMetadata
 
 然后在 MVC 的服务中加入如下 option：
 
-```C#
+```csharp
 //注入MVC服务
 services.AddMvc(options =>
 {
@@ -97,7 +97,7 @@ services.AddMvc(options =>
 
 在这贴一下步骤 3 的无用从属服务器 IP 端口排重的代码：
 
-```C#
+```csharp
 //通过哨兵服务器获取Redis主从服务器端口
 var slaveRedisEndpointConfigs = sentinelServer.SentinelSlaves(sentinelConfig.ServiceName);
 string ip, port, flags;

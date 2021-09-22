@@ -40,7 +40,7 @@ categories:
 
 因此，微服务的请求方法其实可以简单定义成这样：
 
-```C#
+```csharp
 /// <summary>
 /// 微服务请求方法
 /// </summary>
@@ -51,7 +51,7 @@ ResponseModel Invoke(RequestModel requestModel);
 
 但是光这样肯定是不够的，有了请求响应，没有其他的请求地址、请求方式等还是无法调用微服务接口，但是这些信息不应该加在请求的 `RequestModel` 中，因为这个 Model 是需要序列化传递的，加入了这些参数就影响了序列化结果，并且也不好获取结果。但其实可以发现，无论是请求地址、请求方式、权限验证等参数都是微服务接口自身的属性，不会因为调用参数的改变而改变，也就是说他们是和特定的微服务接口绑定的，不管怎么调用这几个参数都这么传递。与之相似的，每次调用都需要传递 `RequestModel` ，只不过参数的值不一样，所以我想到了将这些参数加入 `RequestModel` 的类特性进行传递，于是有了这样一个特性 `InterfaceRequestAttribute`：
 
-```C#
+```csharp
 /// <summary>
 /// 接口请求特性
 /// </summary>
@@ -102,7 +102,7 @@ public class InterfaceRequestAttribute : Attribute
 
 我完全可以在 `RequestModel` 中加上这个特性，让其特定表示为一个微服务的请求参数模型，然后在接口请求的 Invoke 方法中，通过反射的方式将这些参数读取出来就可以使用了。但是如果没有使用特性的模型类放入请求参数肯定是不行的，因此加入了一个接口 `IAttributeConstraint` 作为约束。所以，最终确定的调用方式是这样的：
 
-```C#
+```csharp
 /// <summary>
 /// 微服务请求方法
 /// </summary>
@@ -115,7 +115,7 @@ TResponseModel Invoke<TRequestModel, TResponseModel>(TRequestModel requestModel)
 
 而微服务的请求模型定义成这样：
 
-```C#
+```csharp
 /// <summary>
 /// XXX服务请求模型
 /// </summary>
@@ -171,7 +171,7 @@ public class XXXXRequestModel : IAttributeConstraint
 
 拆分这么多方法一个是为了扩展性，另一个目的是为了服务于 `IInvokeService` 中的 `InjectService()` 方法：
 
-```C#
+```csharp
 /// <summary>
 /// 请求内部服务注入
 /// </summary>
@@ -184,7 +184,7 @@ IInjectedInvokeService InjectServie(IRequestService requestService = null, IResp
 
 加入这个方法的目的就是为了解决对整个请求参数的可自定义功能，例如：如果当前 IInvokeService 中不支持解析返回值类型是 XML 格式的功能，那么就可以这样做：
 
-```C#
+```csharp
 /// <summary>
 /// 自定义响应服务
 /// </summary>

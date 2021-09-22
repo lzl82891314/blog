@@ -21,7 +21,7 @@ categories:
 
 虽然这么叫但其实它就是提供 Dapper 封装的，里面有增删改查多少操作，方法有很多，随便列举几个：
 
-```C#
+```csharp
 /// <summary>
 /// 配置数据库连接串
 /// </summary>
@@ -75,7 +75,7 @@ Task<IEnumerable<dynamic>> QueryAsync(string sql, object param = null, IDbTransa
 
 当时我的想法就是，需要连接数据库时，直接从 DI 容器中 Resolve 出一个 IQueryService，然后使用其方法直接加入 Sql 语句和参数就可以了，省去了创建连接串、using 语句等操作。所以 `IQueryService` 的实现大概就是这样的：
 
-```C#
+```csharp
 using Dapper;
 
 namespace QueryServiceImpl
@@ -117,7 +117,7 @@ namespace QueryServiceImpl
 
 可以看到作者使用委托的方式进行数据库事件处理，而 `IDbConnection` 则是通过方法来获取的。作者这么做是为了满足 DDD 中的事件驱动，但是我们的项目不需要这么复杂，所以不会这么写。但是还是有可以借鉴的地方，那就是 `委托` 。既然 ENode 的作者用委托封装查询逻辑，那我是不是可以反过来用委托封装 `IDbConnection` 的生成呢？所以以这个思路，我把 `IDbConnection` 对象的生成改成了委托，在 `IQueryService` 中删除了 `ConfigConnNode()` 方法加入了一个属性 `ConnStrCreator` ：
 
-```C#
+```csharp
 /// <summary>
 /// 数据库连接串创建委托
 /// </summary>
@@ -126,7 +126,7 @@ Func<string, IDbConnection> ConnStrCreator { get; set; }
 
 因此上述的 `Execute` 方法实现就可以写成这样了：
 
-```C#
+```csharp
 using Dapper;
 
 namespace QueryServiceImpl
@@ -159,7 +159,7 @@ namespace QueryServiceImpl
 
 这样写确实舒服了很多，解决了 `IDbConnection` 创建和 `IQueryService` 耦合的问题，但是又引出了另一个问题。 委托 `ConnStrCreator` 从哪来？如果按照现在的设计来使用，就必须在使用前加入对 `ConnStrCreator` 的赋值，整个数据库操作基本是这样的：
 
-```C#
+```csharp
 public class DemoClass
 {
     /// <summary>
@@ -195,7 +195,7 @@ public class DemoClass
 
 加入一个服务 `IQueryFactory` ，用来获取查询服务，内部有两个方法一个属性：
 
-```C#
+```csharp
 /// <summary>
 /// 数据库连接串
 /// </summary>
@@ -222,7 +222,7 @@ IDbConnection CreateDbConnection();
 
 但是这样其实已经可以用了，因为旧项目大部分是用 SqlServer 做的，所以直接注入 SqlServer 工厂就可以了，如果要用到 MySql 那手动 new 一个应该也是可以的。然而，在使用的时候，发现另一个很严重的问题。如果按照下面这种方式写代码：
 
-```C#
+```csharp
 public void Query()
 {
     //connNode1连接的是数据库A
@@ -259,7 +259,7 @@ public object InnerQuery()
 
 为了解决上述两个问题，我加入了 `IFactoryService` 服务用来创建数据库连接对象工厂，内部就一个方法：
 
-```C#
+```csharp
 /// <summary>
 /// 创建数据库连接对象工厂
 /// </summary>
@@ -275,7 +275,7 @@ IQueryFactory GetQueryFactory(FactoryTypeEnum factoryTypeEnum);
 
 其实至此这个数据库操作服务已经可以用了，但是原生的 Dapper 使用起来很麻烦，增删改查都需要自己写 Sql 语句，如果有地方写错了或者数据库字段更改了都不好修改。所以我继续封装了一遍 Dapper 的使用，使其可以通过对象来简化 Sql。为此定义了一个空的接口 `IQueryServiceConstraint` 用来约束想使用对象操作的模型类，并且为这个接口写了很多扩展方法，以反射的方法获取对象中的属性来做到拼接 `增删改` Sql 的效果。例如一个获取 `Insert Sql` 的方法可以写成这样：
 
-```C#
+```csharp
 /// <summary>
 /// 获取该模型类的插入Sql
 /// </summary>
