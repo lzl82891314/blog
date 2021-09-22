@@ -17,7 +17,7 @@ ELK 是 elastic 公司推出的一套分布式的日志分析系统，是 elasti
 
 因此，从上述的介绍可以知道，ELK 的主要功能都被 elasticsearch 占据，其余两个组件是依托于 elasticsearch 而存活的，我们可以通过下图来看一下 elastic stack 的相关内容：
 
-![elastic_stack](https://raw.githubusercontent.com/lzl82891314/Notes/main/elk/resource/elastic_stack.png)
+![elastic_stack](https://image.dunbreak.cn/elk/elastic_stack.png)
 
 ## 安装流程
 
@@ -49,7 +49,7 @@ sudo tar -xzvf elasticsearch-7.10.1-linux-x86_64.tar.gz
 
 解压结束后进入目录可以看到如下的几个文件夹，在此做一下简单的说明：
 
-![elasticsearch_files](https://raw.githubusercontent.com/lzl82891314/Notes/main/elk/resource/elasticsearch_files.png)
+![elasticsearch_files](https://image.dunbreak.cn/elk/elasticsearch_files.png)
 
 - bin: 存放 elasticsearch 的脚本文件
 - config：是集群的配置文件，核心的配置在`elasticsearch.yml`中，这个文件需要做大量的配置，会在后面的章节说明
@@ -75,7 +75,7 @@ sudo chown -R jeffery:jeffery /mnt/work/elk/elasticsearch
 
 之后就可以看到 elasticsearch 已经开始运行了：
 
-![elasticsearch_starting](https://raw.githubusercontent.com/lzl82891314/Notes/main/elk/resource/elasticsearch_starting.png)
+![elasticsearch_starting](https://image.dunbreak.cn/elk/elasticsearch_starting.png)
 
 如果想了解运行状态，可以通过 9200 端口查看，比如：
 
@@ -85,7 +85,7 @@ curl localhost:9200
 
 可以看到返回如下信息，说明 elasticsearch 已经成功运行：
 
-![elasticsearch_running](https://raw.githubusercontent.com/lzl82891314/Notes/main/elk/resource/elasticsearch_running.png)
+![elasticsearch_running](https://image.dunbreak.cn/elk/elasticsearch_running.png)
 
 此外，如果想为 elasticsearch 安装插件，可以执行以下命令进行安装：
 
@@ -122,7 +122,7 @@ bin/kibana
 
 在默认情况下，kibana 就会寻找本地 9200 端口下的 elasticsearch，因此在默认情况下可以不用配置任何信息即可运行 elasticsearch 和 kibana，运行成功后，可以访问本机的 5601 端口访问 kibana，如下图所示：
 
-![kibana_home](https://raw.githubusercontent.com/lzl82891314/Notes/main/elk/resource/kibana_home.png)
+![kibana_home](https://image.dunbreak.cn/elk/kibana_home.png)
 
 可以看到 kibana 已经成功运行了，并且提示你可以为 kibana 添加一些默认默认的样例数据，如果添加了，这些数据就会被写入 elasticsearch 中，并且在 kibana 的`Discover`菜单下就可以对其进行操作。
 
@@ -295,11 +295,11 @@ docker-compose down
 
 一切配置运行成功之后，我们就可以看到一个完整的监控项目了，下图是当前系统的 elasticsearch 信息，通过 9000 端口访问 cerebro 即可：
 
-![cerebro](https://raw.githubusercontent.com/lzl82891314/Notes/main/elk/resource/cerebro.png)
+![cerebro](https://image.dunbreak.cn/elk/cerebro.png)
 
 可以看到，我们的集群中有一个 elasticsearch 节点，有 8 个索引，分布在 9 个分片上，已经写入了 7428 个文档，占用了 13.53M。其中，写入的这些文件，就是通过上述的 metricbeat 采集到的监控数据，数据信息是所在宿主机的系统数据，我们可以在 kibana 中看到它们的完整数据：
 
-![kibana_metricbeat_data](https://raw.githubusercontent.com/lzl82891314/Notes/main/elk/resource/kibana_metricbeat_data.png)
+![kibana_metricbeat_data](https://image.dunbreak.cn/elk/kibana_metricbeat_data.png)
 
 此外，如果首次运行 elasticsearch 是可能会报错：`max virtual memory areas vm.max_map_count [65530] is too low, increase to at least [262144]`，此时是系统中的最大虚拟内存设置过低，elasticsearch 运行至少需要 262144，因此可以执行以下命令解决：
 
