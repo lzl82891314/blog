@@ -4,6 +4,10 @@ url_name: Simple-usage-on-Elasticsearch
 date: 2020-12-30 20:08:18
 categories:
   - Elasticsearch
+tags:
+  - Elasticsearch
+  - 后端
+  - 监控
 ---
 
 ELK 是 elastic 公司推出的一套分布式的日志分析系统，是 elastic stack 的核心组件，由三个子系统组成，即：elasticsearch（E）、logstash（L）以及 kibana（K）。在此分别简单介绍一下它们的功能点：

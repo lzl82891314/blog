@@ -3,8 +3,12 @@ title: Nest框架入门
 url_name: Summary-of-the-Nest-framework
 date: 2019-06-14 20:04:06
 categories:
-  - Node.Js
+  - Node
+tags:
+  - Node.JS
   - 很久以前
+  - 后端
+  - 入门
 ---
 
 该项目是一个使用 Node.JS 的 NestJS 框架开发的中转站点项目，开发语言是 Typescript，使用 Docker 部署，作为前后端分离项目中的前端页面和微服务接口之前的桥梁。

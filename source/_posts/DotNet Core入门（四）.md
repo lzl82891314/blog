@@ -5,7 +5,10 @@ subtitle: 总结.Net Core 碰到的零碎问题
 date: 2018-05-31 19:55:02
 categories:
   - .Net Core
+tags:
+  - .Net Core
   - C#
+  - 入门
   - 很久以前
 ---
 

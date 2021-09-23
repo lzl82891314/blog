@@ -4,7 +4,10 @@ url_name: Getting-Started-with-DotNet-Core-01
 date: 2018-05-28 19:50:55
 categories:
   - .Net Core
+tags:
+  - .Net Core
   - C#
+  - 入门
   - 很久以前
 ---
 

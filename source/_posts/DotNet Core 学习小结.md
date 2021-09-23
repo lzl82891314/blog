@@ -4,7 +4,11 @@ url_name: Learning-summary-of-DotNet-Core
 date: 2018-05-24 19:46:51
 categories:
   - .Net Core
+tags:
+  - .Net Core
   - C#
+  - 入门
+  - 总结
   - 很久以前
 ---
 
