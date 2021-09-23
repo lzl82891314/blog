@@ -1,5 +1,6 @@
 ---
-title: ELK简单部署
+title: Elasticsearch简单部署
+url_name: Simple usage on Elasticsearch
 date: 2020-12-30 20:08:18
 categories:
   - Elasticsearch
