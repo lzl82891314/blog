@@ -19,14 +19,14 @@ categories:
 ## 学习
 
 刚开始完全就是一个学习的阶段，组里给了我两天的时间学习，让我在两天内在提供的测试 Linux 服务器上运行起来.Net Core 的程序，至少得有个 Hello World 吧。我从微软官方文档的 [.Net Core 指南](https://docs.microsoft.com/zh-cn/dotnet/core/)开始看起，但是这篇文档对刚开始学习的人不是很友好，内部大多.Net CLI 以及部署迁移的讲解看的我实在头疼，其实我只想找一个站点怎么启动，对于我这种没有用过 Owin 的人 Startup 到底是啥，怎么在 Linux 运行等问题，所以之后找到了这篇资料 [ASP.NET Core 中文文档目录](http://www.cnblogs.com/dotNETCoreSG/p/aspnetcore-index.html) ，这篇文档我几乎看完了里面写的所有中文翻译的内容，对我的帮助很大，但是很可惜的是作者们没有继续更新，很多想看的章节他们都不再继续写了，并且有些地方用到的是.Net Core 1.0 的资料，和 2.0 有些许不同。但，这已经足够我创建一个 Demo 项目了。
-![学习注释](http://f.cl.ly/items/1y2F3p2Q312h1Y0b3X0x/%E5%AD%A6%E4%B9%A0%E6%B3%A8%E9%87%8A2.png)
-![当时的学习注释，到现在都还留着](http://f.cl.ly/items/1y233N2P300p0m180M2I/%E5%AD%A6%E4%B9%A0%E6%B3%A8%E9%87%8A.png)
+![学习注释](https://image.dunbreak.cn/past/learning-comments-01.png)
+![当时的学习注释，到现在都还留着](https://image.dunbreak.cn/past/learning-comments-02.png)
 
 很快，带着学习注释的 Demo 项目就写完了，发布之后传去了 Linux 服务器，等着看 Hello World 的我却失望了。在当时还傻傻的打着 `dotnet run` 的我，项目完全运行不起来，缺少各种依赖项，没办法当时不太懂，所以每次都是直接把源文件全部传到 Linux 上，然后在 Linux 生成运行。磕磕绊绊，最终 Hello World 还是展示在了 Linux 的 Firefox 上，很高兴！
 
 ## 进阶
 
-机缘巧合，在某个.Net 的学习群里看到了有人在强烈推荐 [Jesse](http://www.jessetalk.cn/) 的视频，抱着试试看的心态点进去看了几节他的 [ASP.NET Core 快速入门](http://video.jessetalk.cn/my/course/4) （当时还是免费的）瞬间被吸引了，然后想都没想直接买了他的付费课程。从这时候开始，我每天上下班地铁上、公司开发休息的时候干的事，就是看他的视频学习。当时的我感觉像是抱住了一颗救命稻草一样如获至宝，因为没有他的视频，我的学习进度非常慢，根本赶不上项目的预期，做不好有可能就会直接被 Java 替换。功夫不负有心人，很快我就看完了他的所有基础课程，并且可供开发的 Demo 项目也已经写得差不多了，通过了组长的评审，确认项目可以在.Net Core 下开发。自此，项目基本进入了正式开发阶段。
+机缘巧合，在某个.Net 的学习群里看到了有人在强烈推荐 [Jesse](http://www.jessetalk.cn/) 的视频，抱着试试看的心态点进去看了几节他的 [ASP.NET Core 快速入门](http://video.jessetalk.cn) （当时还是免费的）瞬间被吸引了，然后想都没想直接买了他的付费课程。从这时候开始，我每天上下班地铁上、公司开发休息的时候干的事，就是看他的视频学习。当时的我感觉像是抱住了一颗救命稻草一样如获至宝，因为没有他的视频，我的学习进度非常慢，根本赶不上项目的预期，做不好有可能就会直接被 Java 替换。功夫不负有心人，很快我就看完了他的所有基础课程，并且可供开发的 Demo 项目也已经写得差不多了，通过了组长的评审，确认项目可以在.Net Core 下开发。自此，项目基本进入了正式开发阶段。
 
 ## 开发
 

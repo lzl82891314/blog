@@ -154,7 +154,7 @@ public class XXXXRequestModel : IAttributeConstraint
 ## 编写 IInvokeService
 
 调用方式既然已经确定了，那就可以开始定义微服务调用服务 `IInvokeService` 了。其实按照上面的逻辑， `IInvokeService` 就包括一个 `Invoke` 方法就足够了，我可以在方法内解析参数，请求结果，记录日志，返回响应等，但是如果这样设计的话就又出现了另一个问题——没有扩展性。 `IInvokeService` 里肯定将会支持几个默认的请求方式，比如 GET 请求方式参数 Url 传递， POST 请求方式参数 Json 传递等，但是以后总会碰到一切奇奇怪怪的接口，比如 GET 需要 JSON 传递参数，POST 需要 Url 传递，返回响应不是一个模型是一个 string 等等，如果碰到 `IInvokeService` 不支持的接口，那这个方法就彻底不能使用了。因为这个原因，我把 `Invoke` 方法进行了拆分。
-![IInvokeService](http://f.cl.ly/items/0B2607373m410m111a20/IInvokeService.png)
+![IInvokeService](https://image.dunbreak.cn/past/IInvokeService.png)
 
 我把 `IInvokeService` 中的请求方法拆分成了多个不同的服务：
 
@@ -227,14 +227,14 @@ public void RequestFunction()
 2. HttpClient 在 Linux 下存在很大的性能问题
 
 对于第一个问题， `IWebRequestService` 在第一个版本中 Get 方式是使用 `WebRequest` 来实现了，本地测试通过之后传去 Linux 服务器发现获取不到结果，一直在超时。通过查找发现
-![.Net Core Web请求](http://f.cl.ly/items/1S2y09101S1T2r3Y2K1k/WebRequest%E5%9C%A8Linux%E5%B7%A5%E4%BD%9C%E6%83%85%E5%86%B5.png)
+![.Net Core Web请求](https://image.dunbreak.cn/past/webrequest-error-on-linux.png)
 
 所以在 Linux 系统下请求 Http 只能通过 HttpClient 的方式实现，也由此引出了第二个问题。
 
 这个问题很奇怪，因为如果是用 IP 的形式在 Linux 下通过 HttpClient 请求接口，是没有什么性能问题的，但是使用域名就会慢 `50-100倍` !这个问题在当时来说是非常严重和棘手的了，一个微服务请求本来只需要 10-100ms，但是在 Linux 下就需要 1000-5000ms，这个时长是无法接受的。但是使用 IP 没问题，所以当时解决这个问题的方向和思路就错了，一直以为是运维搞的 DNS 解析有问题，也因此耗费了大量的时间和经历与运维同事撕逼，但是最终都没有结果，因为他们在服务器使用 Curl 访问是很明显没有那么慢的。无解，最终就是用了临时方案：所有微服务都通过 IP 访问。
 
 但是这种方式解决不了根本问题，因为随着业务的扩展，请求的接口也越来越多，内部也会调用大量其他集团的接口，这样我们就获取不到 IP 了。也是那个时候，我们逐渐发现，这其实不是服务器环境的问题而有可能是.Net Core 在 Linux 下的兼容问题。因此以这个思路开始查找解决方案，发现了这个 Issue：[HttpClient Performance Slow Compared to .NET 4.7](https://github.com/dotnet/corefx/issues/23401)，在这个 Issue 底下发现了一个哥们碰到了和我完全相同的问题：
-![HttpClientIssue](http://f.cl.ly/items/342w1A2r1I09273K0T3Y/HttpClientIssue.png)
+![HttpClientIssue](https://image.dunbreak.cn/past/HttpClientIssue.png)
 
 查了一下我们所有服务器的.Net Core Runtime 的版本：2.0.5。。。看来真的是微软留的一个坑而不是我们自身的问题，这么多天错怪运维同事了，现在想想都有点丢人。。。底下微软工程师的回复就是——升级.Net Core Runtime！最终升级.Net Core Runtime 为 2.0.7 解决了这个问题。。。其实升级的过程也很曲折，同样也就不多说了，因为升级了 2.0.7 之前删除了 2.0.5 版本的 runtime，所以支持的类库版本高于现有代码的类库版本，因此 Linux 服务器下的 lib 都无法找到了，为了解决这个问题，在解决方案文件中加入了如下属性：
 

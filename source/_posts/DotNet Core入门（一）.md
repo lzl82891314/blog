@@ -19,10 +19,10 @@ categories:
 ## 项目实现
 
 但是在刚开发的时候存在一个业务逻辑问题，集团虽然确定了站点需要实现 SSO 但并没有给出具体的登录服务从何处提供，有可能是其他组做，也有可能我们自己查数据源。但是项目需要继续开发啊，所以在做这个逻辑的时候肯定就会伴随着需求的变更。但是整个站点的登录流程其实都可以简化为这样：
-![登录流程](http://f.cl.ly/items/3L0U1s3u3j0k34440m0u/%E7%99%BB%E5%BD%95%E6%B5%81%E7%A8%8B.png)
+![登录流程](https://image.dunbreak.cn/past/login-process.png)
 
 从请求的流程中可以知道，有可能随业务改变的只有 `查询用户信息` 和 `验证用户信息` 这两个步骤，其余的步骤 `CookieAuthentication` 确定了之后就基本不会大改动了。因此写了 4 个登录相关的接口： `IAuthorityService` 权限验证服务、 `IDataAnalyzeService` 权限数据解析服务、 `IDataQueryService` 权限数据查询服务、 `ICookieService` Cookie 操作服务。
-![IAuthorityService](http://f.cl.ly/items/1T0e1l0M1x1P44211s15/%E6%9D%83%E9%99%90%E6%9C%8D%E5%8A%A1%E8%AE%BE%E8%AE%A1UML.png)
+![IAuthorityService](https://image.dunbreak.cn/past/auth-UML.png)
 
 从 UML 图中可以看到，其他服务基本都是为 `IAuthorityService` 服务的。 `IAuthorityService` 定义了登录的相关操作，用来站点的登录、登出、验证是否登录等和权限相关的操作。但是验证登录需要有用户的登录信息，因此定义了 `IDataQueryService` 服务来提供登录的信息；在登录时需要写入 Cookie 信息，因此需要定义 `ICookieService` 服务来对 Cookie 进行读写操作； 根据[CookieAuthentication](https://docs.microsoft.com/en-us/aspnet/core/security/authentication/cookie?view=aspnetcore-2.0&tabs=aspnetcore2x) 规定，写入的 Cookie 信息必须是一个 `Claim` 的集合，因此还需要 `IDataAnalyzeService` 服务来解析用户的登录信息为 `Claim` 对象写入 Cookie。此外，`IAuthorityService` 和 `ICookieService` 实现了 `IServiceProvider` ，因此这两个服务是提供给上层调用的。站点需要登录时，只需要 Resolve 出 `IAuthorityService` 服务就可以了， 并且也可以单独操作 Cookie 信息。
 

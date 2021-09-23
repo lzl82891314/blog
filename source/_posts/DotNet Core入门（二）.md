@@ -18,7 +18,7 @@ categories:
 ## 第一版——直接封装为 IQueryService
 
 在项目开始做的时候，我并没有想太多东西，其实目的就是为了封装一遍 Dapper 不用每次都写 `using` 语句，所以直接封装了一个 `IQueryService` 封装 Dapper。
-![第一版IQueryService](http://f.cl.ly/items/0K1m2j1z36120t0L2F42/QueryService_Edition1.png)
+![第一版IQueryService](https://image.dunbreak.cn/past/QueryService_Edition1.png)
 
 虽然这么叫但其实它就是提供 Dapper 封装的，里面有增删改查多少操作，方法有很多，随便列举几个：
 
@@ -113,8 +113,8 @@ namespace QueryServiceImpl
 ## 第二次封装——封装 IDbConnection
 
 所以现在问题的核心就是封装 `IDbConnection` 了，只要把它能通过参数生成等方式生成出来就可以解决这个问题了。但是怎么做呢？我想到了当初初学 `ENode` 的时候作者对 Dapper 的一个封装。第一次看他的代码的时候因为工作经验少觉得好高大上，所以对其印象深刻。
-![ENode事件入库](http://f.cl.ly/items/0X3v3C323n0q2h332W3v/ENode_Dapper01.png)
-![ENode数据库操作封装](http://f.cl.ly/items/110r341N392n1k1a1a0w/ENode_Dapper02.png)
+![ENode事件入库](https://image.dunbreak.cn/past/ENode_Dapper01.png)
+![ENode数据库操作封装](https://image.dunbreak.cn/past/ENode_Dapper02.png)
 
 可以看到作者使用委托的方式进行数据库事件处理，而 `IDbConnection` 则是通过方法来获取的。作者这么做是为了满足 DDD 中的事件驱动，但是我们的项目不需要这么复杂，所以不会这么写。但是还是有可以借鉴的地方，那就是 `委托` 。既然 ENode 的作者用委托封装查询逻辑，那我是不是可以反过来用委托封装 `IDbConnection` 的生成呢？所以以这个思路，我把 `IDbConnection` 对象的生成改成了委托，在 `IQueryService` 中删除了 `ConfigConnNode()` 方法加入了一个属性 `ConnStrCreator` ：
 
@@ -217,7 +217,7 @@ IDbConnection CreateDbConnection();
 ```
 
 继而将 `IQueryService` 的 `IServiceProvider` 删除加在 `IQueryFactory` 上。这样修改之后，创建数据库连接对象 `IQueryService` 的任务就交到了 `IQueryFactory` 上。
-![第二版IQueryService](http://f.cl.ly/items/3S0y3F2T3f032t053U1m/QueryService_Edition2.png)
+![第二版IQueryService](https://image.dunbreak.cn/past/QueryService_Edition2.png)
 
 这样看起来是很完美了，创建 `IDbConnection` 的工作交给工厂来做，查询的服务使用 `IQueryService` 。但是在写实现的时候发现，把工厂作为服务，那注入 DI 容器的实现要用谁啊……所以这样设计还是存在问题的，并且这也只是一个简单工厂，并没有完整使用到工厂模式。
 
@@ -270,7 +270,7 @@ IQueryFactory GetQueryFactory(FactoryTypeEnum factoryTypeEnum);
 ```
 
 然后将其注入到 DI 容器中，并且将 `IQueryFactory` 中的 `ConnStr` 数据下放到 `IQueryService` 中。并且又由于此时公司运维数据库权限收回的需求，在 `IQueryFactory` 中加入 `DbConnStrCreator` 委托（这个问题不是重点）。因此，整个封装变成了这样：
-![第三版IQueryService](http://f.cl.ly/items/3Z1K3y2k1Z2k1l1h0s21/QueryService_Edition3.png)
+![第三版IQueryService](https://image.dunbreak.cn/past/QueryService_Edition3.png)
 
 ## 其他封装
 

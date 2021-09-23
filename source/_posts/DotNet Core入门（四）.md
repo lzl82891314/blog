@@ -16,7 +16,7 @@ categories:
 ## 问题一：Unicode 编码
 
 这是项目刚开始开发的时候遇到的问题，页面数据展示都没任何问题，但是浏览器右键查看源代码时，html 标签中绑定的数据源都是 Unicode 乱码。
-![Unicode编码问题](http://f.cl.ly/items/1D0h0d1H2t0P1N3O3A1y/unicode%E7%BC%96%E7%A0%81%E9%97%AE%E9%A2%98.png)
+![Unicode编码问题](https://image.dunbreak.cn/past/unicode-encoding-error.png)
 
 很显然这是一个配置项的问题，查询找到解决方案，在 `Startup` 配置的 `ConfigureServices` 服务配置方法中，注入一个编码服务即可：
 
