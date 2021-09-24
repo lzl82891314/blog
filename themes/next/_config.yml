@@ -611,7 +611,7 @@ livere_uid: # <your_uid>
 gitalk:
   enable: true
   github_id: lzl82891314 # GitHub repo owner
-  repo: https://github.com/lzl82891314/blog # Repository name to store issues
+  repo: blog # Repository name to store issues
   client_id: 173230a788615cea4c0d # GitHub Application Client ID
   client_secret: 9c485c1132010158f88726dee0012d703c9063c7 # GitHub Application Client Secret
   admin_user: lzl82891314 # GitHub repo owner and collaborators, only these guys can initialize gitHub issues
