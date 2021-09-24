@@ -897,16 +897,16 @@ needmoreshare:
     js: //cdn.jsdelivr.net/gh/theme-next/theme-next-needmoreshare2@1/needsharebutton.min.js
     css: //cdn.jsdelivr.net/gh/theme-next/theme-next-needmoreshare2@1/needsharebutton.min.css
   postbottom:
-    enable: true
+    enable: false
     options:
       iconStyle: box
       boxForm: horizontal
       position: bottomRight
       networks: Weibo,Wechat,Douban,Twitter,Linkedin,Facebook
   float:
-    enable: false
+    enable: true
     options:
       iconStyle: box
       boxForm: horizontal
-      position: middleRight
-      networks: Weibo,Wechat,Douban
+      position: topRight
+      networks: Weibo,Wechat,Douban,Twitter,Linkedin,Facebook
