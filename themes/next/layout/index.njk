@@ -8,8 +8,9 @@
 {% block content %}
 
   {%- for post in page.posts.toArray() %}
-    {% if post.hidden != true %}
+    {% if post.hidden == undefined or post.hidden != true %}
       {{ partial('_macro/post.njk', {post: post, is_index: true}) }}
+    {% endif %}
   {%- endfor %}
 
   {%- include '_partials/pagination.njk' -%}
