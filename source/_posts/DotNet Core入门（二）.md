@@ -1,6 +1,6 @@
 ---
 title: .Net Core 入门（二）
-url_name: Getting-Started-with-DotNet-Core-02
+url_name: getting-started-with-dotnet-core-02
 subtitle: 对 ORM 框架 Dapper 的封装
 date: 2018-05-29 19:52:51
 categories:

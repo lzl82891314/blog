@@ -1,6 +1,6 @@
 ---
 title: Elasticsearch简单部署
-url_name: Simple-usage-on-Elasticsearch
+url_name: simple-usage-on-elasticsearch
 date: 2020-12-30 20:08:18
 categories:
   - Elasticsearch
