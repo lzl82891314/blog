@@ -902,7 +902,7 @@ needmoreshare:
       iconStyle: default
       boxForm: horizontal
       position: bottomLeft
-      networks: Weibo,Wechat,Douban,Twitter,Linkedin,Facebook,Mailto,Reddit
+      networks: Weibo,Wechat,Douban,Twitter,Linkedin,Facebook
   float:
     enable: false
     options:
