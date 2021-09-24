@@ -908,5 +908,5 @@ needmoreshare:
     options:
       iconStyle: box
       boxForm: horizontal
-      position: topRight
+      position: middleRight
       networks: Weibo,Wechat,Douban,Twitter,Linkedin,Facebook
