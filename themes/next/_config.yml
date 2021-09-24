@@ -899,9 +899,9 @@ needmoreshare:
   postbottom:
     enable: true
     options:
-      iconStyle: default
+      iconStyle: box
       boxForm: horizontal
-      position: bottomLeft
+      position: bottomRight
       networks: Weibo,Wechat,Douban,Twitter,Linkedin,Facebook
   float:
     enable: false
