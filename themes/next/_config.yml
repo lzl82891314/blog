@@ -899,10 +899,10 @@ needmoreshare:
   postbottom:
     enable: true
     options:
-      iconStyle: box
+      iconStyle: default
       boxForm: horizontal
-      position: bottomCenter
-      networks: Weibo,Wechat,Douban
+      position: bottomLeft
+      networks: Weibo,Wechat,Douban,Twitter,Linkedin,Facebook,Mailto,Reddit
   float:
     enable: false
     options:
