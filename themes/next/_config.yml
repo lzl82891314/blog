@@ -356,16 +356,18 @@ codeblock:
   # Code Highlight theme
   # All available themes: https://theme-next.js.org/highlight/
   theme:
+    enable: false
     light: night-owl
     dark: tomorrow-night
   prism:
-    light: prism
-    dark: prism-dark
+    enable: true
+    light: prism-tomorrow
+    dark: prism-tomorrow
   # Add copy button on codeblock
   copy_button:
     enable: true
     # Available values: default | flat | mac
-    style:
+    style: mac
 
 back2top:
   enable: true
