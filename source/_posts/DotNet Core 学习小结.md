@@ -1,7 +1,7 @@
 ---
 title: .Net Core 学习小结
-url_name: learning-summary-of-dotnet-core
-date: 2018-05-24 19:46:51
+url_name: dotnet-core-summary
+date: 2018-06-04 19:46:51
 categories:
   - .Net Core
 tags:

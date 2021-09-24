@@ -1,6 +1,6 @@
 ---
 title: Nest框架入门
-url_name: summary-of-the-nest-framework
+url_name: nest
 date: 2019-06-14 20:04:06
 categories:
   - Node

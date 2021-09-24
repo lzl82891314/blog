@@ -1,6 +1,6 @@
 ---
 title: .Net Core 入门（一）
-url_name: getting-started-with-dotnet-core-01
+url_name: dotnet-core-01
 date: 2018-05-28 19:50:55
 categories:
   - .Net Core
