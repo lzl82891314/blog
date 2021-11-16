@@ -16,7 +16,7 @@ tags:
 
 Go 最开始吸引我的是它号称`互联网时代的C语言`，第一次听到这个宣传语时，我下意识的以为 Go 是一门和 C 语言一样性能强大并且且可以直接操作硬件的语言。好家伙，学了之后才发现这句话的意思是说 Go 和 C 一样原始……
 
-![https://image.dunbreak.cn/go/hello-go.jpg](hello-go)
+![hello-go](https://image.dunbreak.cn/go/hello-go.jpg)
 
 作为一个 C#er，第一次看到 Go 的语法真是难受的浑身不爽，先不说别的，就单看这个 main 函数我就能发现奇怪的宝藏：`printf` + `%s`这种语法我可能大学毕业就再也没有用过了，然而这种过时的语法既然还能在 Go 这种 2007 年才发布的语言中看到，并且这种写法还是唯一支持的写法……
 
@@ -30,8 +30,8 @@ Go 最开始吸引我的是它号称`互联网时代的C语言`，第一次听�
 
 话说早在 2007 年 9 月的一天，Google 工程师 [Rob Pike](https://en.wikipedia.org/wiki/Rob_Pike) 和往常一样启动了一个 C++项目的构建，按照他之前的经验，这个构建应该需要持续 1 个小时左右。这时他就和 Google 公司的另外两个同事 [Ken Thompson](https://en.wikipedia.org/wiki/Ken_Thompson) 以及 [Robert Griesemer](https://en.wikipedia.org/wiki/Robert_Griesemer) 开始吐槽并且说出了自己想搞一个新语言的想法。当时 Google 内部主要使用 C++构建各种系统，但 C++复杂性巨大并且原生缺少对并发的支持，使得这三位大佬苦恼不已。
 
-![https://image.dunbreak.cn/go/authors.png](authors)
+![authors](https://image.dunbreak.cn/go/authors.png)
 
 第一天的闲聊初有成效，他们迅速构想了一门新语言：能够给程序员带来快乐，能够匹配未来的硬件发展趋势以及满足 Google 内部的大规模网络服务。并且在第二天，他们又碰头开始认真构思这门新语言。第二天会后，Robert Griesemer 发出了如下的一封邮件：
 
-![https://image.dunbreak.cn/go/plan-email.webp](plan-email)
+![plan-email](https://image.dunbreak.cn/go/plan-email.webp)
