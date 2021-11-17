@@ -92,6 +92,15 @@ Go 的简单从关键字的个数上就可以很好的体现出来了。
 
 Go 一共只有可怜的`25个关键字`，而我数了数 C#的，好家伙，基础关键字就有`77个`，除此之外还有`42个上下文关键字！`一共有 119 个关键字，这几乎是 Go 的 5 倍之多！
 
+Go 语言中的 25 个关键字：
+
+| break    | default     | func   | interface | select |
+| -------- | ----------- | ------ | --------- | ------ |
+| case     | defer       | go     | map       | struct |
+| chan     | else        | goto   | package   | switch |
+| const    | fallthrough | if     | range     | type   |
+| continue | for         | import | return    | var    |
+
 既然这样，那就以关键字为切入点，主要对比学习一下 Go 和 C#的关键字有哪些差别，进而来全面地学习一下 Go 的语法。为此，我主要把 Go 和 C#的关键字进行了分类，来按类别学习这些关键字的异同。
 
 ### 咱俩都有的
@@ -103,9 +112,11 @@ Go 一共只有可怜的`25个关键字`，而我数了数 C#的，好家伙，�
 - default
 - else
 - for
+- goto
 - if
 - interface
 - return
+- struct
 - switch
 - var
 
@@ -201,6 +212,14 @@ for index, value := range array {
 
 foreach 语句的写法和 C#中很不相同，上述的例子是 foreach 遍历一个 int 类型的数组，其中用到了一个`range`关键字，这个关键字会把数组拆分成两个迭代子对象 index 和 value，这个语法同样类似于 JavaScript 的循环语法。
 
+#### struct
+
+Go 中的 struct 关键字和 C#中的作用是相同的，即定义一个结构体。
+
+上面我们提到了，Go 中是没有类这个概念的，那唯一承载 C#中 class 作用的定义就是 struct 了。和 C#相同，struct 在 Go 中同样也是值类型变量，因此使用的时候一定需要注意案值传递导致的复制问题。
+
+此外 Go 中的 struct 内只能定义字段，不能定义函数，这些概念会在后面的面向对象小节中主要说明。
+
 #### 其他
 
 1. return 关键字和 C#功能是相同的，这里拿出来是要说一下，Go 中的 return 同样也可以同时返回多个结果，Java 没有这样的语法代码写起来实在是费劲。
@@ -210,6 +229,184 @@ foreach 语句的写法和 C#中很不相同，上述的例子是 foreach 遍历
 
 ### 虽然不太一样但是意思差不多的
 
-Go 和 C#中还有几个相似用法的关键字，但是它们的名字不太相同，这里可以大概了解一下做一个对应即可。
+- package
+- import
+- type
+- defer
 
 #### package 和 namespace
+
+上面已经提到了，Go 的函数是一等公民，因此，Go 比 C#少了一层类的封装，相对的，对函数的封装就体现在了包里。
+
+Go 中的 package 就是定义组织一个包的，其目的和 C#的 namespace 基本是相同的，主要是对代码模块进行隔离。但是有一点和 C#不同，C#十分灵活，即是不在一个文件夹下的代码都可以定义为相同的 namespace。但是 Go 不行，Go 中 package 内的文件，都需要在相同的文件夹内才能被正确编译，并且一个文件夹内只能出现最多一个包名。
+
+这里再额外说一下 main 包，类似于 C#中的 Main 方法，Go 中可运行程序的执行入口也是一个 main 函数，并且如果想要让程序顺利执行，main 函数必须定义在`package main`下。
+
+#### import 和 using
+
+这俩用法也基本是相同的，都是用来导入其他模块的代码来使用的。和 C#using 的是 namespace 相同，Go 中 import 的同样也是其他包的名字。
+
+这里要说一个 Go 的强制要求：没有在代码模块中使用的 import 或者定义了但是没有使用的变量等，在 Go 编译时会直接报错。
+
+这样做除了使代码看起来更简洁以外，最主要的原因是 import 语句除了引用其他包还有另一个功能就是调用包中的`init()`函数。比如如下代码：
+
+```go
+package demo
+
+var me string
+
+func init() {
+	me = "jeffery"
+}
+
+func SayHello() {
+	fmt.Printf("hello, %s", me)
+}
+```
+
+> 这段代码中，定义了一个包级变量`me`，这种变量可以类比于 C#中的静态变量。
+
+上述的程序定义了一个 demo 包，当 demo 包第一次被 import 关键字加载到其他包时，会自动调用其`init()`函数，这就优点类似于 C#中类的构造方法，这时就会把`变量me`赋值为`jeffery`，之后调用`SayHello()`函数时，返回的就都是"hello, jeffery"了。
+
+也正是因为`init`函数的存在，不使用的 import 需要被删除，因为很有可能会自动调用到对应包内的 init 函数。
+
+#### type 和 class
+
+- 常规用法
+
+把 type 和 class 对比其实是不太合理的。因为 C#中 class 关键字是定义一个类型并且定义这个类型的具体实现，比如下述的代码在 C#中的意思是定义一个名为 People 的类，并且定义了这类中有一个属性 Age。
+
+```csharp
+class interface IAnimal {
+  public void Move();
+}
+
+class People {
+  public int Age { get;set; }
+}
+```
+
+然而 Go 中的 type 关键字仅仅是用来定义类型名称的，如果想要定义其实现，必须后面再更上具体实现的关键字。比如上述的代码定义在 Go 中就变成了如下：
+
+```go
+type IAnimal interface {
+  Move()
+}
+
+type People struct {
+  Age int
+}
+```
+
+上述只是 type 的最常用用法，除此之外 type 还有两个其他的用法：
+
+- 以一个基准类型定义一个新类型
+
+```go
+type Human People
+```
+
+这样的语句相当于用`People`类型定义了一个`Human`的新类型。**注意，这里是一个新类型，而不是 C#中的继承**。因此如果 People 内有一个 Move 函数，那 Human 对象是无法调用这个 Move 函数的，如果非要使用，则需要强制类型转换。
+
+> Go 中的强制类型转换是类型 + ()，比如上述的例子 Human(People)就可以把 People 类型强转为 Human 类型。
+
+- 定义类型别名
+
+```go
+type Human = People
+```
+
+如果使用了`等号`进行定义，那就相当于给类型 People 定义了一个别名 Human，这种情况下 People 中的代码 Human 也是可以正常使用的。
+
+上面两种用法基本都不常用，这里只做了解即可。
+
+#### defer 和 finally
+
+Go 中的 defer 作用就是 C#的 finally，在一个方法执行结束退出之前，可以干一件事。
+
+而和 C#不太一样的是，Go 中的 defer 语句不用必须写在最后，比如我们会经常看到这样风格的代码：
+
+```go
+var mutex sync.Mutex
+
+func do() {
+  mutex.Lock()
+  defer mutex.Unlock()
+  // ...
+}
+```
+
+上面这个例子的意思是定义一个全局锁，在 do 函数进入时，加锁，在退出时解锁。之后再去写自己的业务逻辑。
+
+除此之外，defer 也可以写多个，但最终的执行顺序是从下向上执行，也就是最后定义的 defer 先执行。
+
+### Go 有而 C#没有的
+
+- chan
+- go
+- fallthrough
+- func
+- map
+- range
+- select
+
+#### go 和 chan
+
+这两个关键字是 Go 并发编程定义的关键字，具体的这部分会在后面的并发编程小节重点讲解。
+
+#### fallthrough
+
+这个关键字估计连职业 Go 开发工程师一辈子也用不了一次的那种。这个关键字完全是为了兼容 C 语言中的 fallthrough，其目的是是在 switch-case 语句中再向下跳一个 case，比如：
+
+```go
+switch n := "a"; n {
+  case n == "a":
+    fmt.Println("a")
+    fallthrough
+  case n == "b":
+    fmt.Println("b")
+  case n == "c":
+    fmt.Println("c")
+}
+```
+
+那这个例子的最终输出结果就是：
+
+```bash
+a
+b
+```
+
+#### func
+
+和其他函数是一等公民的语言（比如 JavaScript 的 function，Python 中的 def）一样，Go 中的 func 就是用来定义函数的。
+
+此外，Go 中的 func 同样也可以配合 type 使用定义 C#中的委托，比如我们可以在 C#中定义一个.Net Core 的中间件：
+
+```csharp
+public delegate void handleFunc(HttpContext httpContext);
+public delegate handleFunc middleware(handleFunc next);
+```
+
+这样的代码可以在 Go 中这样实现：
+
+```go
+type handleFunc func(httpContext HttpContext)
+type middleware func(next handleFunc) handleFunc
+```
+
+#### map
+
+map 关键字是用来定义 map 类型对象的。是的，Go 中原生了哈希对象，这个 map 创建出来的对象就类似于 C#中的`Dictionary<TKey, TValue>`对象。
+
+这个 map 对象会在后面的 Go 中的特殊语法小节中专门讲解。
+
+#### range
+
+range 关键字在之前说 for 的时候就已经演示过功能了，就是用来遍历集合的。
+
+#### select
+
+select 关键字是一个并发编程的概念，会在后面讲并发编程的小节中主要讲解。
+
+至此，我已经把 Go 中的 25 个关键字简单的一一概括了一下。到此为止，我们虽然还不能写出优雅的 Go 代码，但是至少我们应该可以看懂 Go 语言的一些语法概念了。
