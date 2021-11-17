@@ -88,6 +88,8 @@ Go 是一门致力于简单的语言，从最开始的 Hello, World 函数中我
 
 好了，有了上述这些基础的概念，我们就可以正式学习如何当一名合格的地鼠了。不过，既然我们都已经是成熟的 C#er 了，那学习 Go 肯定不能从 int 是什么意思说起了，如何找一个切入点呢？
 
+### 关键字
+
 Go 的简单从关键字的个数上就可以很好的体现出来了。
 
 Go 一共只有可怜的`25个关键字`，而我数了数 C#的，好家伙，基础关键字就有`77个`，除此之外还有`42个上下文关键字！`一共有 119 个关键字，这几乎是 Go 的 5 倍之多！
@@ -103,7 +105,7 @@ Go 语言中的 25 个关键字：
 
 既然这样，那就以关键字为切入点，主要对比学习一下 Go 和 C#的关键字有哪些差别，进而来全面地学习一下 Go 的语法。为此，我主要把 Go 和 C#的关键字进行了分类，来按类别学习这些关键字的异同。
 
-### 咱俩都有的
+#### 咱俩都有的
 
 - break
 - case
@@ -122,7 +124,7 @@ Go 语言中的 25 个关键字：
 
 以上的 12 个关键字是 Go 和 C#共有的，它们之中大部分的用法都是完全相同的，这里主要说一下 Go 中有特殊语法的关键字。
 
-#### var
+##### var
 
 首先，让我们来看看参数定义关键字 var。
 
@@ -146,7 +148,7 @@ i, j := 1, "hello"
 
 上述的代码可以简写为这种语法糖形式，Go 代码中，90%的变量都是以这样的方式定义的，因为 Go 中几乎所有的函数都会存在多余一个的返回值，这样的定义可以省去很大功夫。
 
-#### switch-case-default
+##### switch-case-default
 
 switch-case 是一个连用的子句，但是 case 和 default 这两个关键字在 Go 中除了可以和 switch 连用，还可以和后面会讲到的 select 语句连用。
 
@@ -173,7 +175,7 @@ switch n := "a"; n {
 
 最后，我们可以看到 switch 之后没有跟小括号，在 Go 中，控制块的子句后面都是不需要写小括号的，如果写了同样会被 gofmt 自动格式化掉。
 
-#### for
+##### for
 
 Go 中的循环控制语句`有且只有`一个 for 关键字。而 C#中的 while、foreach 等在 Go 中都是通过 for 的各种变形达成的。
 
@@ -212,7 +214,7 @@ for index, value := range array {
 
 foreach 语句的写法和 C#中很不相同，上述的例子是 foreach 遍历一个 int 类型的数组，其中用到了一个`range`关键字，这个关键字会把数组拆分成两个迭代子对象 index 和 value，这个语法同样类似于 JavaScript 的循环语法。
 
-#### struct
+##### struct
 
 Go 中的 struct 关键字和 C#中的作用是相同的，即定义一个结构体。
 
@@ -220,21 +222,21 @@ Go 中的 struct 关键字和 C#中的作用是相同的，即定义一个结构
 
 此外 Go 中的 struct 内只能定义字段，不能定义函数，这些概念会在后面的面向对象小节中主要说明。
 
-#### 其他
+##### 其他
 
 1. return 关键字和 C#功能是相同的，这里拿出来是要说一下，Go 中的 return 同样也可以同时返回多个结果，Java 没有这样的语法代码写起来实在是费劲。
 2. interface 没讲，这个关键字和 C#相同都是定义接口的，而 Go 中的接口实现方式和 C#完全不同，需要在后面详细说明，所以这里就简单带过。
 
 其余没有说明的关键字用法和 C#完全相同，就不一一说明了。
 
-### 虽然不太一样但是意思差不多的
+#### 虽然不太一样但是意思差不多的
 
 - package
 - import
 - type
 - defer
 
-#### package 和 namespace
+##### package 和 namespace
 
 上面已经提到了，Go 的函数是一等公民，因此，Go 比 C#少了一层类的封装，相对的，对函数的封装就体现在了包里。
 
@@ -242,7 +244,7 @@ Go 中的 package 就是定义组织一个包的，其目的和 C#的 namespace 
 
 这里再额外说一下 main 包，类似于 C#中的 Main 方法，Go 中可运行程序的执行入口也是一个 main 函数，并且如果想要让程序顺利执行，main 函数必须定义在`package main`下。
 
-#### import 和 using
+##### import 和 using
 
 这俩用法也基本是相同的，都是用来导入其他模块的代码来使用的。和 C#using 的是 namespace 相同，Go 中 import 的同样也是其他包的名字。
 
@@ -270,7 +272,7 @@ func SayHello() {
 
 也正是因为`init`函数的存在，不使用的 import 需要被删除，因为很有可能会自动调用到对应包内的 init 函数。
 
-#### type 和 class
+##### type 和 class
 
 - 常规用法
 
@@ -320,7 +322,7 @@ type Human = People
 
 上面两种用法基本都不常用，这里只做了解即可。
 
-#### defer 和 finally
+##### defer 和 finally
 
 Go 中的 defer 作用就是 C#的 finally，在一个方法执行结束退出之前，可以干一件事。
 
@@ -340,7 +342,7 @@ func do() {
 
 除此之外，defer 也可以写多个，但最终的执行顺序是从下向上执行，也就是最后定义的 defer 先执行。
 
-### Go 有而 C#没有的
+#### Go 有而 C#没有的
 
 - chan
 - go
@@ -350,11 +352,11 @@ func do() {
 - range
 - select
 
-#### go 和 chan
+##### go 和 chan
 
 这两个关键字是 Go 并发编程定义的关键字，具体的这部分会在后面的并发编程小节重点讲解。
 
-#### fallthrough
+##### fallthrough
 
 这个关键字估计连职业 Go 开发工程师一辈子也用不了一次的那种。这个关键字完全是为了兼容 C 语言中的 fallthrough，其目的是是在 switch-case 语句中再向下跳一个 case，比如：
 
@@ -377,7 +379,7 @@ a
 b
 ```
 
-#### func
+##### func
 
 和其他函数是一等公民的语言（比如 JavaScript 的 function，Python 中的 def）一样，Go 中的 func 就是用来定义函数的。
 
@@ -395,17 +397,17 @@ type handleFunc func(httpContext HttpContext)
 type middleware func(next handleFunc) handleFunc
 ```
 
-#### map
+##### map
 
 map 关键字是用来定义 map 类型对象的。是的，Go 中原生了哈希对象，这个 map 创建出来的对象就类似于 C#中的`Dictionary<TKey, TValue>`对象。
 
 这个 map 对象会在后面的 Go 中的特殊语法小节中专门讲解。
 
-#### range
+##### range
 
 range 关键字在之前说 for 的时候就已经演示过功能了，就是用来遍历集合的。
 
-#### select
+##### select
 
 select 关键字是一个并发编程的概念，会在后面讲并发编程的小节中主要讲解。
 
