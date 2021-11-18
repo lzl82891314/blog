@@ -1,8 +1,7 @@
 ---
 title: Go, 从入门到忘记
 url_name: go-startup
-date: 2021-11-14 15:21:38
-hidden: true
+date: 2021-11-18 15:05:38
 categories:
   - Go
 tags:
@@ -922,7 +921,7 @@ Play() {...}
 
 因为如果一台服务器 1 秒中的并发量可达 10000 个，那么对应的服务器就需要开启至少 1 万个线程去服务这些并发请求。而线程的创建也是需要资源的，以 Linux 为例，一个 POSIX Thread 的创建成本是*1-8MB 不等*，那 1 秒 10000 个请求就需要在 1 秒内消耗掉*10-80GB*的内存资源，这个数量是十分恐怖的。
 
-并且，CPU 从一个线程调度到另一个线程是需要线程上下文切换的，这也是一个性能损耗点。什么是上下文切换？我们上面说了，线程同样也有自己的 TCB 去记录自己的堆栈和程序计数器寄存器等。操作系统在进行线程调度时，需要从一个线程的 TCB 中将上述的所有资源加载到 CPU 执行的寄存器和内存中才能执行。当一个线程的时间片结束切换到另一个线程时，操作系统同样需要将上一个程序的最终资源信息
+并且，CPU 从一个线程调度到另一个线程是需要线程上下文切换的，这也是一个性能损耗点。什么是上下文切换？我们上面说了，线程同样也有自己的 TCB 去记录自己的堆栈和程序计数器寄存器等。操作系统在进行线程调度时，需要从一个线程的 TCB 中将上述的所有资源加载到 CPU 执行的寄存器和内存中才能执行。当一个线程的时间片结束切换到另一个线程时，操作系统同样需要将上一个程序的最终资源信息记录回之前的线程 TCB 中，然后再加载新线程的 TCB 中的资源。这个过程被称为**线程的上下文切换**，这个开销一般在**3-5us 左右**。
 
 除此之外，目前的互联网请求大多数都是需要读取数据的并且返回给用户展示的。那数据的读取就需要 IO 操作，IO 操作时操作系统又会将对应的线程阻塞，因此有人做过测试，高并发情况下，有 80%的线程其实都是阻塞状态的，它们只占资源缺不干活，白白占用了系统资源。并且如果内存不足操作系统可能会挂起进程，从而频繁地触发缺页中断，给了本就不宽裕的 IO 带宽更大的压力，形成了更严重的恶性循环。
 
@@ -942,9 +941,7 @@ IO 多路复用就是，和一个请求开一个线程不同，Nginx 这类服�
 
 目前市面上的所有 CPU 指令集其实都是分级别的，一般分为 ring0~ring3 一共 4 个级别，离 ring0 越近，获得的 CPU 指令的权限就越大，相应能干的事就越多，但是对应的不安全的风险也就越高。由此我们可以知道，**用户态和内核态其实是完全隔离的**。
 
-因此现在的操作系统都是分用户态和内核态的。以 Linux 为例，ring0 是内核态，ring3 即是用户态。
-
-我们日常开发的所有程序都是用户态程序，在用户态程序我们仅能操作计算机很小一部分的功能，大部分功能，比如 IO 读写，内存分配和各种硬件交互等等都是由内核程序完成的。
+因此现在的操作系统都是分用户态和内核态的。以 Linux 为例，ring0 是内核态，ring3 即是用户态。我们日常开发的所有程序都是用户态程序，在用户态程序我们仅能操作计算机很小一部分的功能，大部分功能，比如 IO 读写，内存分配和各种硬件交互等等都是由内核程序完成的。
 
 这时肯定有同学问了，哎不对啊，我的代码同样可以读文件并且把各种信息写在屏幕上啊？那是怎么实现的？
 
@@ -952,27 +949,21 @@ IO 多路复用就是，和一个请求开一个线程不同，Nginx 这类服�
 
 去年网上有一个阿里巴巴的二面面试题，问*为什么 RocketMQ 和 Kafka 的速度那么快？*其实是因为 RocketMQ 和 Kafka 在进行 IO 操作的时候都用到了 linux 中的一个 零拷贝技术 mmap，让数据读写过程中少一次系统调用切换带来的内存拷贝，而是映射到相同的一块内存区域，从而达到的加速。对这个问题感兴趣的同学可以去看 [什么是 mmap](https://mp.weixin.qq.com/s/sG0rviJlhVtHzGfd5NoqDQ)。
 
-因此，在线程这个概念出现之前，就已经出现了用户态线程的概念，即用户态的程序内部自己模拟多线程的调度，操作系统仅仅是调度了对应的进程，却感知不到对应进程内的线程。
+因此，在线程这个概念出现之前，就已经出现了用户态线程的概念，即用户态的程序内部自己模拟多线程的调度，操作系统仅仅是调度了对应的进程，却感知不到对应进程内的线程，协程带来的直接好处是*不需要创建 TCB 了*，可以节省下线程创建时对应的内存开销。
 
-这样做的好处是：不需要创建 TCB 了，因为对操作系统来说没有这个线程的概念，不需要它们调度。一个用户态线程的创建成本直接从 1-8MB 降到了**2KB 左右**，因为内部的线程共享统一的运行堆栈和寄存器空间的，不同的用户态线程只需创建一个程序计数器的指针标记当前的位置即可，非常轻量级。并且由于线程是用户态的，自己在自己内部切换执行逻辑同样不会有**线程上下文切换**的开销
+不过如果这么看来，协程就又是一个和 Docker 一样旧瓶装新酒的技术？还真不是。
 
-那这么看来，协程就又是一个和 Docker 一样旧瓶装新酒的技术？还真不是。
+早期的用户态线程虽然有一定的性能优势，但是还是解决不了一个问题：**无法感知系统中断**。我们知道，现在的操作系统都是*抢占式*的，操作系统会默认优先执行高优先级的程序，如果目前正在调度一个低优先级的程序，那操作系统会触发一个中断让高优先级的程序抢占它。抢占是操作系统通过发送系统中断实现的，然而操作系统感知不到协程的存在，所以协程自身是无法处理抢占的中断事件的。此外，如果一个用户态线程进行了 IO 操作，那操作系统会把整个线程阻塞，对应的没有调用 IO 的协程也会被阻塞。最后，由于操作系统的调度单位是进程，所以每次时间片分配到各个协程就更少了，所以 CPU 算力也是需要解决的一个问题。
 
-虽然用户态线程有一定的性能优势，但是还是解决不了一个严重的问题，即用户态线程**无法感知系统中断**。我们知道，现在的操作系统都是*抢占式*的，操作系统会默认优先执行高优先级的程序，如果目前正在调度一个低优先级的程序，那操作系统会触发一个中断让高优先级的程序抢占它。
-
-而抢占式一个操作系统的概念，而操作系统却感知不到用户态线程的存在，因此用户态线程无法处理抢占。此外，如果一个用户态线程进行了 IO 操作，那操作系统会把整个进程阻塞，对应的没有调用 IO 的用户态线程也会被阻塞。最后，由于操作系统的调度单位是进程，所以每次时间片分配到各个用户级线程就更少了，所以 CPU 算力也是需要解决的一个问题。
-
-也真是因为这些问题吧，各个操作系统才进一步发开了自己的系统级线程。
+也是因为这些问题吧，各个操作系统才进一步推出自己的系统级线程。
 
 ### Goroutine
 
-Goroutine 其实是 Go 对协程的更高层的封装。
+Goroutine 其实是 Go 为了解决上述普通协程的问题而做出的更高层的封装。
 
 > Go 的作者 Rob Pike 是这样描述 Goroutine 的：Goroutine 是一个于其他 Goroutine 并行运行在同一地址空间的 Go 函数或方法。一个运行的程序由一个或多个 Goroutine 组成。它于线程、协程、进程等不同。它是一个 Goroutine。
 
-上一节我们说到的早起用户态线程，和真正的系统级线程的比例一般都是*1:N*的，即一个系统线程上运行着 N 个用户态线程。这样的设计就无法避免上述提到的一些问题。
-
-为了解决这个问题，Go 在语言提供了一种 GM 模型（后期逐渐演化为 GMP 模型，但是本文只是简单入门，所以不会涉及 GMP 模型），总体来说就是让用户态线程即 Goroutine(G) 和真正的线程 Machine(M) 成为一个*N:M*的模型，如下图所示：
+对于上一节提到的早期协程，基本和线程的匹配模型都是*N:1*的，即一个线程需要同事维护多个协程。这样的构建模型就无法解决上述出现的问题。为此 Go 在语言提供了一种 GM 模型（后期逐渐演化为 GMP 模型），总体来说就是让用户态线程即 Goroutine(G) 和真正的线程 Machine(M) 成为一个*N:M*的模型，如下图所示：
 
 ![GM_01](https://image.dunbreak.cn/go/GM_01.webp)
 
@@ -986,6 +977,263 @@ Github 上有一个大佬，是百度的 Go 工程师，他自己用 Go 写了�
 
 可以看到，GM 模型其实也是存在很多问题的，比如统一使用了一个全局锁，Goroutine 的调度依赖全局队列，程序执行器和 Goroutine 没有强依赖导致很多情况下不满足局部性原理，M 的内存分配和扩展等等。因此 Go 团队后期又进一步进化到了 GMP 模型，加入了一个 Processor，感兴趣的同学去学习了解[GMP 模型](https://learnku.com/articles/41728)。
 
-在 Go 的一番操作之后，一个 Goroutine 的创建成本变成了 2KB，
+综上，Goroutine 和线程相比，具有以下优势：
+
+1. 很低的初始资源。一个 Goroutine 的创建成本直接从线程的 1-8MB**降到了默认 2KB**，由于不需要创建 TCB，Goroutine 只需要创建一个程序计数器的指针记录自己当前运行的函数栈位置即可。
+2. 几乎没有上下文切换开销。一个 Goroutine 由 GoRuntime 调度，调度开销完全就是入队出队的操作，不需要切换上下文。和线程的 3.5us 相比，Goroutine 的[切换开销大概在 100ns 左右](https://zhuanlan.zhihu.com/p/80037638)。
+3. 运行线程不会被阻塞。当 Goroutine 发出系统调用的时，其自身会被 runtime 直接调离 M，对应的 M 又会继续去执行新的 Goroutine 程序，极大地提高了线程利用率。
+
+同时，结合 IO 多路复用技术和 runtime 调度，解决了早期协程一些严重性的问题，从而顺利从互联网时代突围出来，成为了各个大厂以及底层组件的主力语言。
 
 ### talk is cheap
+
+好了，知道了 Goroutine 的各种优点，最后我们来看看一个 Go 的并发编程模型是如何实现的。
+
+```go
+func say(s string) {
+	for i := 0; i < 5; i++ {
+		time.Sleep(100 * time.Millisecond)
+		fmt.Println(s)
+	}
+}
+
+func sayHello() {
+	go say("hello")
+	say("world")
+}
+```
+
+这是 Go 官方文档中的 Goroutine 部分的一段示例。可以看到运行一段 Goroutine 的语法非常简单，就只需要一个 `go 关键字`即可。上述的例子最终会输出"hello world"。和 C#的传染性不同，Go 代码从外部是完全看不到代码是不是异步实现的，这就给开发者降低了一些心智压力。
+
+我们知道，C#设计这套复杂的*async/await*模型，其实就是为了解决异步方法 callback 难以获取的问题。所以加入了 await 关键字，对异步状态机的结果监听，最终返回异步线程上下文中的结果。然而 Go 没有 await，那是如何进行上下文同步的呢？
+
+```go
+func calN(n int, ch chan<- int) {
+  // 模拟复杂的N计算
+  time.Sleep(time.Second)
+
+  // 返回结果
+  ch <- n * n
+}
+
+func main() {
+  ch := make(chan int, 1)
+  go calN(12345, ch)
+  select {
+    case ans := <-ch: {
+      fmt.Printf("answer is: %d", ans)
+    }
+    default {
+      time.Sleep(time.Millisecond * 100)
+    }
+  }
+}
+```
+
+这里我们终于学到了最后一个关键字 `select` 以及最后一个引用类型 `chan` 了。
+
+#### chan
+
+先来说 chan，chan 是 channel 的意思，是多个 goroutine 进行数据传递的通道，其作用类似于 C#中的 Pipe，相当于是再多个并发执行的 goroutine 中掏了个洞洞用来传递数据。
+
+chan 和指针一样是由类型的，是一个**引用类型**，通过`make()`函数初始化，第二个参数是通道的 size。由此可知，通道其实就是一个**双端队列**，多个 goroutine 都可以往通道中读写数据，当通道 buffer 被写满后，写通道的 goroutine 就会被**阻塞**。
+
+写通道的语法特别简单就是一个箭头符号`<-`（注意只有左箭头唯一一种，没有右箭头），`ch<-`代表想通道写数据，`<-ch`代表从通道读出数据。
+
+#### select
+
+再来看 `select 关键字`，这里的 select 其实就是 linux 操作系统的 IO 多路复用技术的一个指令，其目的就是当接收到异步事件时*轮询每一个事件结果*。
+
+Go 实现了语言级别的 select 功能，它的作用和 linux 的 select 类似，就是**阻塞当前 goroutine**等待 chan 的返回。
+
+通常 select 会配合 case 和 default 使用，使用方式类似于 switch-case 语句，满足哪一个就触发哪一个。上述代码中，当我使用`select关键字`读取通道内的数据时，由于刚开始`caN`函数还没有返回，所以 main 的 goroutine 进入了 default 会睡 100 毫秒。之后再次循环之前的操作直至某个 case 中有 return 等退出的语句。
+
+如果同一时间同事满足了多个 case，那 Go Runtime 会**随机选择一个 case 去执行**。通常情况下，Goroutine 的超时都是自己写一个超时函数实现的，比如下列代码：
+
+```go
+func makeNum(ch chan<- int) {
+	time.Sleep(5 * time.Second)
+	ch <- 10
+}
+
+func timeout(ch chan<- int) {
+	time.Sleep(3 * time.Second)
+	ch <- 0
+}
+
+func chanBlock() {
+	ch := make(chan int, 1)
+	timeoutCh := make(chan int, 1)
+	go makeNum(ch)
+	go timeout(timeoutCh)
+	select {
+	case <-ch:
+		fmt.Println(ch)
+	case <-timeoutCh:
+		fmt.Println("timeout")
+	}
+}
+```
+
+#### 生产者-消费者模型
+
+好了，为了更熟练地理解 Goroutine 的编程风格，最后让我们用 Goroutine 实现一个操作系统同步互斥问题中比较经典的`生产者-消费者`模型：
+
+```go
+// 需求：创建生产者消费者模型，其中生产者和消费者分别是N和M个
+// 生产者每隔一段时间生产X产品，消费者同样也每隔一段时间消费Y产品
+// 生产者如果将产品容器填满应该被阻塞，多次阻塞之后将会退出
+// 每个消费者需要消费满Z个产品才能退出，否则就要一直消费产品
+
+const (
+	ProducerCount = 3   // 生产者数量
+	ConsumerCount = 5   // 消费者数量
+	FullCount     = 15  // 消费者需求数量，消费者吃够了应该回家
+	TimeFactor    = 5   // 时间间隔因子，每生产/消费一个产品，需要休息一段时间
+  QuitTimes     = 3   // 生产者退出次数，如果生产者阻塞了多次，则会下班
+  SleepFactor   = 3   // 睡眠时间因子，如果生产者被阻塞应该睡眠一段时间
+)
+
+var (
+	waitGroup = sync.WaitGroup{}
+)
+
+func producer(n int, ch chan<- int) {
+	defer waitGroup.Done()
+	times := createFactor()
+	asleepTimes := 0
+	for true {
+		p := createFactor()
+		select {
+		case ch <- p:
+			{
+				t := time.Duration(times) * time.Second
+				fmt.Printf("Producer: %d produced a %d, then will sleep %d s\n", n, p, times)
+				time.Sleep(t)
+			}
+		default:
+			{
+				time.Sleep(time.Second * SleepFactor)
+				asleepTimes++
+				fmt.Println("I need consumers!")
+				if asleepTimes == QuitTimes {
+					fmt.Printf("Producer %d will go home\n", n)
+					return
+				}
+			}
+		}
+	}
+}
+
+func consumer(n int, ch chan int) {
+	waitGroup.Done()
+	s := make([]int, 0, FullCount)
+	times := createFactor()
+	for len(s) < FullCount {
+		select {
+		case c := <-ch:
+			{
+				s = append(s, c)
+				fmt.Printf("Consumer: %d consume a %d, remains %d, then will sleep %d s\n", n, c, FullCount-len(s), times)
+				time.Sleep(time.Duration(times) * time.Second)
+			}
+		default:
+			{
+				fmt.Println("Producers need to hurry up, I'm hungry!")
+				time.Sleep(time.Second * SleepFactor)
+			}
+		}
+	}
+	fmt.Printf("Consumer: %d already full\n", n)
+}
+
+func createFactor() int {
+	times := 0
+	for times == 0 {
+		times = rand.Intn(TimeFactor)
+	}
+	return times
+}
+
+func main() {
+	rand.Seed(time.Now().UnixNano())
+	ch := make(chan int, FullCount)
+
+	waitGroup.Add(ProducerCount)
+	for i := 0; i < ProducerCount; i++ {
+		go producer(i, ch)
+	}
+
+	waitGroup.Add(ConsumerCount)
+	for i := 0; i < ConsumerCount; i++ {
+		go consumer(i, ch)
+	}
+
+	waitGroup.Wait()
+}
+```
+
+这里用到了 Goroutine 中另一个比较常见的包`sync`，上例中用到了一个 WaitGroup，其目的类似于 C#中的`Task.WaitAll`，用来等待所有的 goroutine 执行结束。可以看到它基本是基于`信号量`实现的，所以每次创建 goroutine 时，都需要执行 Add 函数。
+
+## 如何优雅地摆一个可爱的造型
+
+好了，至此 Go 语言的所有基本功能和语法就都已经介绍完毕了（其实还有反射，但是我觉得 Go 的反射实现的不太行，语法诡异所以就不介绍了），但是光看这些文字是没办法学会 Go 的，作为一个工科，软件行业是需要反复地练习来逐步熟练的。
+
+最开始，我是通过强制自己用 Go 刷 LeetCode，但是效果不是很好，因为有些算法题本来就很复杂，光理解都需要花很多功夫，再用上一个自己不熟练的语言，简直完美的达到了事倍功半的效果。
+
+那既然 Go 的大部分使用需求都是用来开发互联网服务的，我觉得我们就有必要做一个小练习，用 Go 来开发一个 Web 服务。
+
+### Hello, World
+
+Go 原生自带的 net 包是 Go 用来开发 Web 项目的基础组件，其中 net 对应的是七层网络协议的 TCP/IP 层，这一层太过底层了，不适合我们这些学习的新手，所以我们从应用层的 net.http 包来实现一个 Web 版的 Hello，World 小程序。
+
+其实，net.http 包下有一个函数`ListenAndServe`，这个函数就是用来创建一个 Web 服务的，其第一个参数是站点地址，而第二个参数是一个 Handler 接口。那是不是只要我们实现了这个接口，就可以写一个最简单的 hello, world 站点了呢？没错，就是这么简单~
+
+```go
+// 创建一个Server结构体
+type Server struct {}
+
+// 为结构体实现http.Handler接口，这个接口就只有这一个函数
+func (s *Server) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+  w.Write(json.Marshal("hello, world"))
+}
+
+func main() {
+  http.ListenAndServe("localhost:8080", &Server{})
+}
+```
+
+直接执行上述的代码，好家伙齐活了。就三句代码就真启动了一个运行在 8080 端口的最简单的 Web 服务。
+
+VS2022 发布之后，C#10 也可以使用三句话发布一个 hello, world 服务了，代码如下。感兴趣的同学可以去尝试一下，C#10 中，默认删除了 Main 函数中的各种引用和类，让 C#看起来更像是一个“主流”语言了，为微软公司点赞。
+
+```csharp
+var builder = WebApplication.CreateBuilder(args);
+var app = builder.Build();
+app.MapGet("/", () => "Hello World").Run();
+```
+
+### Toy-Web
+
+有了上述的基础概念，我们就可以写一个练手项目，真正的开发点属于自己的东西了。
+
+上述的 Hello, World 虽然建站简单，但是缺少几个常用 Web 框架的主要功能：
+
+1. 路由，没有路由所有的请求都只能返回 HelloWorld 吗？那肯定没法用了
+2. 中间件，现在公司的业务大量使用到了中间件实现各种逻辑，我觉得实现一个中间件也是一次不错的尝试
+3. 上下文封装，从 Hello，World 程序中我们可以看到，请求的响应我是通过 w.Write 函数拼接一个 Json 实现的，但是日常开发中我们都不会去处理这些东西，因此需要封装起来统一处理
+
+其实还有更多的复杂功能，往简单说有 MVC 分层，Action 请求参数自动解析，往难了说还有 Ioc 和 Aop…但是万事开头难，让我们先想办法实现上面三个最简单的功能。
+
+我的最终目标是，同我们自己写的 Toy-Web 写一个所有网络开发的必修练习`图书管理系统`的后台 Api 服务。
+
+这个小项目的讲解就不属于 Go 语言的基本范畴了，因为内部大多都是设计的问题，语法就那么一点，重点是要看怎么做一个代码简洁并且有扩展性健壮性的程序。
+
+比如我可以说几个点：
+
+1. Server 其实应该设计为一个 IServer 接口提供最简单的 Start 和 Shutdown 服务，以为 Server 肯定是会有版本变更的，HelloWorld 那种直接写死就堵死了扩展性
+2. 上下文可以抽象为一个 IContext 接口，对外暴露各种封装请求以及需要封装一个 Go 的 Context 库用来处理后续的请求超时断开等功能
+3. 路由同样也应该抽象为一个 IRouter 接口，其中有一个 Map 函数来注册路由，可以明确的是路由应该很大可能有多个版本的。因为最开始，我们的路由可能只能做简单的 map 匹配，随着我们对 Go 语言语法的熟悉，应该想办法实现通配符的匹配逻辑，即我 Map("hello/\*")应该把所有的 hello 之后的请求都解析到对应的 Action 中。后续可能还会增加正则表达式，路径参数等需求，所以路由的设计也是一个重点
+4. 可以学习 C#，将路由的处理 Handler 封装为一个 Action，这样做的好处是可以很完美的支持中间件，中间件的语法我在之前介绍函数的时候已经写好了，可以直接使用
+
+最后，提供一个我自己纯手工每一行代码都是自己实现的[Toy-Web](https://github.com/lzl82891314/training-go-2/tree/main/src/toy-web)。这个练手的小项目也花了我很大的精力才完成，真正想要自己实现其实也需要一点算法功底，比如路由应该使用 Trie 树，匹配通配符需要 BFS 和 DFS 的知识，如果需要路由节点扩展，则需要会回溯的算法。总之，万丈高楼平地起，加油吧，各位新生的 Gopher 们，祝我们都有一个美好的未来。
