@@ -844,7 +844,7 @@ type Fib interface {
 
 通过这个小练习，我们还可以看到 Go 工具链中的性能测试功能，如下图：
 
-![fibonacci](https://image.dunbreak.cn/go/fibonacci.webp)
+![fibonacci](https://image.dunbreak.cn/go/fibonacci.png)
 
 这里我们调用了 Go 的基准测试包 Benchmark 的功能对上述四个算法进行了一一测试，从结果中我们可以看到每个算法的时间复杂度和空间复杂度，也可以看到一个问题的逐步优化的过程，我觉得这是一个很好地功能。
 
@@ -911,7 +911,7 @@ Play() {...}
 
 虽然进程内的线程是共享内存的，但是线程的执行时相互独立的，因此每个线程就需要有自己的寄存器和程序计数器，堆栈等资源。因此，和进程控制块 PCB 相同，线程也有自己的线程控制块 TCB，来记录上述的一些自己独享的资源。进程和线程的模型如下图：
 
-![process-thread](https://image.dunbreak.cn/go/process-thread.webp)
+![process-thread](https://image.dunbreak.cn/go/process-thread.png)
 
 ### 互联网时代
 
@@ -965,13 +965,13 @@ Goroutine 其实是 Go 为了解决上述普通协程的问题而做出的更高
 
 对于上一节提到的早期协程，基本和线程的匹配模型都是*N:1*的，即一个线程需要同事维护多个协程。这样的构建模型就无法解决上述出现的问题。为此 Go 在语言提供了一种 GM 模型（后期逐渐演化为 GMP 模型），总体来说就是让用户态线程即 Goroutine(G) 和真正的线程 Machine(M) 成为一个*N:M*的模型，如下图所示：
 
-![GM_01](https://image.dunbreak.cn/go/GM_01.webp)
+![GM_01](https://image.dunbreak.cn/go/GM_01.jpg)
 
 可以看到 Goroutine 是依附在系统线程运行的。它们统一由 Go Runtime 管理，所以 Go 的核心其实就是它的 runtime，go runtime 内统一管理了 Goroutine 的创建销毁，和会统一给它们分配内存，响应系统调用等等，其内部包括了内存管理，进程管理，设备管理的主要功能，而真正的操作系统其实也就这么点功能，可以说 go runtime 就已经是**一个小型的操作系统**了。
 
 Github 上有一个大佬，是百度的 Go 工程师，他自己用 Go 写了一个小操作系统[eggos](https://github.com/icexin/eggos)，并且成功把它装到了一个没有操作系统的裸机上，并且还能在里面玩超级马里奥。感兴趣的同学可以去学习了解一下，这种事在.net 平台几乎是无法实现的。
 
-![GM_02](https://image.dunbreak.cn/go/GM_02.webp)
+![GM_02](https://image.dunbreak.cn/go/GM_02.jpg)
 
 上图是早起（Go1.2 版本）Go 对 Goroutine 的调度模型。我们程序中新创建的 Goroutine 其实最开始是被加入了`global queue`这个队列中，然后程序真正的执行器 M 就会从这个队列中捞待调度的 Goroutine 来运行。当运行中的 Goroutine 触发了 IO 等系统调度时，runtime 会重新把它移回到 global queue 中。同样的，如果运行中的 Goroutine 内创建了新的 Goroutine，那同样也会把 Goroutine 放入 global queue 中等待调度。此外，runtime 还会启动一个监控线程监控这些运行中的 Goroutine，如果超过规定的时间片，那这些 Goroutine 就会被重新移回 global queue 中。
 
