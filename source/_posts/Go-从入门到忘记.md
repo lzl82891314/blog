@@ -174,6 +174,26 @@ switch n := "a"; n {
 
 最后，我们可以看到 switch 之后没有跟小括号，在 Go 中，控制块的子句后面都是不需要写小括号的，如果写了同样会被 gofmt 自动格式化掉。
 
+##### if-else
+
+Go 语言中的 if-else 和 C#几乎也是相同的，区别还是 Go 语言的特殊语法，可以在 if-else 控制块中直接给变量赋值并且在控制块中使用这些值。
+
+```go
+func isEven(n int) bool {
+	return n % 2 == 0
+}
+
+func main() {
+	if n := rand.Intn(1000); isEven(n) {
+		fmt.Printf("%d是偶数\n", n)
+	} else {
+		fmt.Printf("%d是奇数\n", n)
+	}
+}
+```
+
+> Go 这种拼接字符串的方式简直让人想死。
+
 ##### for
 
 Go 中的循环控制语句`有且只有`一个 for 关键字。而 C#中的 while、foreach 等在 Go 中都是通过 for 的各种变形达成的。
