@@ -275,6 +275,20 @@ type People struct {
 
 上面已经提到了，Go 的函数是一等公民，因此，Go 比 C#少了一层类的封装，相对的，对函数的封装就体现在了包里。
 
+```go
+// Go中，同一个文件夹只能同时存在一个包名
+// 包名可以和文件夹名不同，但是必须有且只有一个
+package main
+
+// main函数只能在main包下才能正确作为启动函数运行
+func main() {
+	//do something
+}
+
+// 同文件夹下的另一个文件，比如hello.go
+package hello	//编译器报错
+```
+
 Go 中的 package 就是定义组织一个包的，其目的和 C#的 namespace 基本是相同的，主要是对代码模块进行隔离。但是有一点和 C#不同，C#十分灵活，即是不在一个文件夹下的代码都可以定义为相同的 namespace。但是 Go 不行，Go 中 package 内的文件，都需要在相同的文件夹内才能被正确编译，并且一个文件夹内只能出现最多一个包名。
 
 这里再额外说一下 main 包，类似于 C#中的 Main 方法，Go 中可运行程序的执行入口也是一个 main 函数，并且如果想要让程序顺利执行，main 函数必须定义在`package main`下。
@@ -288,6 +302,7 @@ Go 中的 package 就是定义组织一个包的，其目的和 C#的 namespace 
 这样做除了使代码看起来更简洁以外，最主要的原因是 import 语句除了引用其他包还有另一个功能就是调用包中的`init()`函数。比如如下代码：
 
 ```go
+// hello文件夹下的demo文件夹内的 demo.go
 package demo
 
 var me string
@@ -298,6 +313,15 @@ func init() {
 
 func SayHello() {
 	fmt.Printf("hello, %s", me)
+}
+
+// hello文件夹下的hello.go
+package main
+
+import "hello/demo"
+
+func main() {
+	demo.SayHello()		// 输出：hello, jeffery
 }
 ```
 
@@ -314,7 +338,7 @@ func SayHello() {
 把 type 和 class 对比其实是不太合理的。因为 C#中 class 关键字是定义一个类型并且定义这个类型的具体实现，比如下述的代码在 C#中的意思是定义一个名为 People 的类，并且定义了这类中有一个属性 Age。
 
 ```csharp
-class interface IAnimal {
+interface IAnimal {
   public void Move();
 }
 
@@ -364,7 +388,7 @@ Go 中的 defer 作用就是 C#的 finally，在一个方法执行结束退出�
 而和 C#不太一样的是，Go 中的 defer 语句不用必须写在最后，比如我们会经常看到这样风格的代码：
 
 ```go
-var mutex sync.Mutex
+var mutex sync.Mutex	// 一个全局锁，可以类似的等价于C#中的Monitor类
 
 func do() {
   mutex.Lock()
